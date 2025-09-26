@@ -1,0 +1,458 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h2>Create Account</h2>
+      <p>Join our healthcare appointment system</p>
+    </div>
+
+    <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="register-form">
+      <!-- User Type Selection -->
+      <div class="form-group">
+        <label for="userType">Register as:</label>
+        <select 
+          id="userType" 
+          name="userType"
+          [(ngModel)]="registerData.userType" 
+          required
+          class="form-control"
+          #userType="ngModel">
+          <option value="">Select user type</option>
+          <option value="patient">Patient</option>
+          <option value="doctor">Doctor</option>
+          <option value="admin">Administrator</option>
+        </select>
+        <div class="error-message" *ngIf="userType.invalid && userType.touched">
+          Please select a user type
+        </div>
+      </div>
+
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h3>Personal Information</h3>
+        
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="firstName">First Name</label>
+            <input 
+              type="text" 
+              id="firstName"
+              name="firstName"
+              [(ngModel)]="registerData.firstName"
+              required
+              minlength="2"
+              class="form-control"
+              placeholder="Enter your first name"
+              #firstName="ngModel">
+            <div class="error-message" *ngIf="firstName.invalid && firstName.touched">
+              <span *ngIf="firstName.errors?.['required']">First name is required</span>
+              <span *ngIf="firstName.errors?.['minlength']">Minimum 2 characters required</span>
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="lastName">Last Name</label>
+            <input 
+              type="text" 
+              id="lastName"
+              name="lastName"
+              [(ngModel)]="registerData.lastName"
+              required
+              minlength="2"
+              class="form-control"
+              placeholder="Enter your last name"
+              #lastName="ngModel">
+            <div class="error-message" *ngIf="lastName.invalid && lastName.touched">
+              <span *ngIf="lastName.errors?.['required']">Last name is required</span>
+              <span *ngIf="lastName.errors?.['minlength']">Minimum 2 characters required</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="dateOfBirth">Date of Birth</label>
+            <input 
+              type="date" 
+              id="dateOfBirth"
+              name="dateOfBirth"
+              [(ngModel)]="registerData.dateOfBirth"
+              required
+              class="form-control"
+              #dateOfBirth="ngModel">
+            <div class="error-message" *ngIf="dateOfBirth.invalid && dateOfBirth.touched">
+              Date of birth is required
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="gender">Gender</label>
+            <select 
+              id="gender"
+              name="gender"
+              [(ngModel)]="registerData.gender"
+              required
+              class="form-control"
+              #gender="ngModel">
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+            <div class="error-message" *ngIf="gender.invalid && gender.touched">
+              Please select your gender
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nationalId">National ID Number</label>
+          <input 
+            type="text" 
+            id="nationalId"
+            name="nationalId"
+            [(ngModel)]="registerData.nationalId"
+            required
+            pattern="^[0-9]{2}-[0-9]{6,7}-[A-Z][0-9]{2}$"
+            class="form-control"
+            placeholder="e.g., 63-123456-A12"
+            #nationalId="ngModel">
+          <div class="error-message" *ngIf="nationalId.invalid && nationalId.touched">
+            <span *ngIf="nationalId.errors?.['required']">National ID is required</span>
+            <span *ngIf="nationalId.errors?.['pattern']">Invalid format (e.g., 63-123456-A12)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="form-section">
+        <h3>Contact Information</h3>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email"
+            name="email"
+            [(ngModel)]="registerData.email"
+            required
+            email
+            class="form-control"
+            placeholder="Enter your email address"
+            #email="ngModel">
+          <div class="error-message" *ngIf="email.invalid && email.touched">
+            <span *ngIf="email.errors?.['required']">Email is required</span>
+            <span *ngIf="email.errors?.['email']">Please enter a valid email</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phoneNumber"
+            name="phoneNumber"
+            [(ngModel)]="registerData.phoneNumber"
+            required
+            pattern="^(\+263|0)[0-9]{9}$"
+            class="form-control"
+            placeholder="e.g., +263771234567 or 0771234567"
+            #phoneNumber="ngModel">
+          <div class="error-message" *ngIf="phoneNumber.invalid && phoneNumber.touched">
+            <span *ngIf="phoneNumber.errors?.['required']">Phone number is required</span>
+            <span *ngIf="phoneNumber.errors?.['pattern']">Invalid format (e.g., +263771234567)</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Physical Address</label>
+          <textarea 
+            id="address"
+            name="address"
+            [(ngModel)]="registerData.address"
+            required
+            class="form-control"
+            rows="3"
+            placeholder="Enter your full address"
+            #address="ngModel"></textarea>
+          <div class="error-message" *ngIf="address.invalid && address.touched">
+            Address is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor-specific fields -->
+      <div class="form-section" *ngIf="registerData.userType === 'doctor'">
+        <h3>Professional Information</h3>
+        
+        <div class="form-group">
+          <label for="medicalLicense">Medical License Number</label>
+          <input 
+            type="text" 
+            id="medicalLicense"
+            name="medicalLicense"
+            [(ngModel)]="registerData.medicalLicense"
+            [required]="registerData.userType === 'doctor'"
+            class="form-control"
+            placeholder="Enter your medical license number"
+            #medicalLicense="ngModel">
+          <div class="error-message" *ngIf="medicalLicense.invalid && medicalLicense.touched">
+            Medical license number is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="specialization">Specialization</label>
+          <select 
+            id="specialization"
+            name="specialization"
+            [(ngModel)]="registerData.specialization"
+            [required]="registerData.userType === 'doctor'"
+            class="form-control"
+            #specialization="ngModel">
+            <option value="">Select specialization</option>
+            <option value="general-practice">General Practice</option>
+            <option value="cardiology">Cardiology</option>
+            <option value="dermatology">Dermatology</option>
+            <option value="pediatrics">Pediatrics</option>
+            <option value="gynecology">Gynecology</option>
+            <option value="orthopedics">Orthopedics</option>
+            <option value="neurology">Neurology</option>
+            <option value="psychiatry">Psychiatry</option>
+            <option value="ophthalmology">Ophthalmology</option>
+            <option value="ent">ENT (Ear, Nose, Throat)</option>
+            <option value="surgery">Surgery</option>
+            <option value="radiology">Radiology</option>
+            <option value="pathology">Pathology</option>
+            <option value="anesthesiology">Anesthesiology</option>
+            <option value="emergency-medicine">Emergency Medicine</option>
+          </select>
+          <div class="error-message" *ngIf="specialization.invalid && specialization.touched">
+            Please select your specialization
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="yearsOfExperience">Years of Experience</label>
+            <input 
+              type="number" 
+              id="yearsOfExperience"
+              name="yearsOfExperience"
+              [(ngModel)]="registerData.yearsOfExperience"
+              [required]="registerData.userType === 'doctor'"
+              min="0"
+              max="50"
+              class="form-control"
+              placeholder="Enter years of experience"
+              #yearsOfExperience="ngModel">
+            <div class="error-message" *ngIf="yearsOfExperience.invalid && yearsOfExperience.touched">
+              Years of experience is required
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="consultationFee">Consultation Fee (USD)</label>
+            <input 
+              type="number" 
+              id="consultationFee"
+              name="consultationFee"
+              [(ngModel)]="registerData.consultationFee"
+              [required]="registerData.userType === 'doctor'"
+              min="0"
+              step="0.01"
+              class="form-control"
+              placeholder="Enter consultation fee"
+              #consultationFee="ngModel">
+            <div class="error-message" *ngIf="consultationFee.invalid && consultationFee.touched">
+              Consultation fee is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="hospitalAffiliation">Hospital/Clinic Affiliation</label>
+          <input 
+            type="text" 
+            id="hospitalAffiliation"
+            name="hospitalAffiliation"
+            [(ngModel)]="registerData.hospitalAffiliation"
+            class="form-control"
+            placeholder="Enter hospital or clinic name (optional)">
+        </div>
+      </div>
+
+      <!-- Patient-specific fields -->
+      <div class="form-section" *ngIf="registerData.userType === 'patient'">
+        <h3>Medical Information</h3>
+        
+        <div class="form-group">
+          <label for="bloodType">Blood Type</label>
+          <select 
+            id="bloodType"
+            name="bloodType"
+            [(ngModel)]="registerData.bloodType"
+            class="form-control">
+            <option value="">Select blood type (optional)</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="allergies">Known Allergies</label>
+          <textarea 
+            id="allergies"
+            name="allergies"
+            [(ngModel)]="registerData.allergies"
+            class="form-control"
+            rows="3"
+            placeholder="List any known allergies (optional)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="emergencyContactName">Emergency Contact Name</label>
+          <input 
+            type="text" 
+            id="emergencyContactName"
+            name="emergencyContactName"
+            [(ngModel)]="registerData.emergencyContactName"
+            [required]="registerData.userType === 'patient'"
+            class="form-control"
+            placeholder="Enter emergency contact name"
+            #emergencyContactName="ngModel">
+          <div class="error-message" *ngIf="emergencyContactName.invalid && emergencyContactName.touched">
+            Emergency contact name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="emergencyContactPhone">Emergency Contact Phone</label>
+          <input 
+            type="tel" 
+            id="emergencyContactPhone"
+            name="emergencyContactPhone"
+            [(ngModel)]="registerData.emergencyContactPhone"
+            [required]="registerData.userType === 'patient'"
+            pattern="^(\+263|0)[0-9]{9}$"
+            class="form-control"
+            placeholder="Enter emergency contact phone"
+            #emergencyContactPhone="ngModel">
+          <div class="error-message" *ngIf="emergencyContactPhone.invalid && emergencyContactPhone.touched">
+            <span *ngIf="emergencyContactPhone.errors?.['required']">Emergency contact phone is required</span>
+            <span *ngIf="emergencyContactPhone.errors?.['pattern']">Invalid phone format</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Information -->
+      <div class="form-section">
+        <h3>Security Information</h3>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password"
+            name="password"
+            [(ngModel)]="registerData.password"
+            required
+            minlength="8"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+            class="form-control"
+            placeholder="Create a strong password"
+            #password="ngModel">
+          <div class="password-requirements">
+            <small>Password must contain:</small>
+            <ul>
+              <li [class.valid]="hasLowercase(registerData.password)">At least one lowercase letter</li>
+              <li [class.valid]="hasUppercase(registerData.password)">At least one uppercase letter</li>
+              <li [class.valid]="hasNumber(registerData.password)">At least one number</li>
+              <li [class.valid]="hasSpecialChar(registerData.password)">At least one special character</li>
+              <li [class.valid]="registerData.password && registerData.password.length >= 8">At least 8 characters</li>
+            </ul>
+          </div>
+          <div class="error-message" *ngIf="password.invalid && password.touched">
+            Please create a strong password meeting all requirements
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input 
+            type="password" 
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="registerData.confirmPassword"
+            required
+            class="form-control"
+            placeholder="Confirm your password"
+            #confirmPassword="ngModel">
+          <div class="error-message" *ngIf="confirmPassword.invalid && confirmPassword.touched">
+            Please confirm your password
+          </div>
+          <div class="error-message" *ngIf="registerData.password !== registerData.confirmPassword && confirmPassword.touched">
+            Passwords do not match
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-section">
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox"
+              name="agreeToTerms"
+              [(ngModel)]="registerData.agreeToTerms"
+              required
+              #agreeToTerms="ngModel">
+            <span class="checkmark"></span>
+            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+          </label>
+          <div class="error-message" *ngIf="agreeToTerms.invalid && agreeToTerms.touched">
+            You must agree to the terms and conditions
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox"
+              name="agreeToDataProcessing"
+              [(ngModel)]="registerData.agreeToDataProcessing"
+              required
+              #agreeToDataProcessing="ngModel">
+            <span class="checkmark"></span>
+            I consent to the processing of my personal data for healthcare services
+          </label>
+          <div class="error-message" *ngIf="agreeToDataProcessing.invalid && agreeToDataProcessing.touched">
+            Data processing consent is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="!registerForm.valid || registerData.password !== registerData.confirmPassword || isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner"></span>
+          {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+        </button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="form-footer">
+        <p>Already have an account? <a routerLink="/login">Sign in here</a></p>
+      </div>
+    </form>
+  </div>
+</div>

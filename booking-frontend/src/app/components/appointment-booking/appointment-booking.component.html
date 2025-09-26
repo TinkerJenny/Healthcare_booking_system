@@ -1,0 +1,30 @@
+<!-- src/app/components/appointment-booking/appointment-booking.component.html -->
+<div class="appointment-booking-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Book an Appointment</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Reason for Visit</mat-label>
+          <input matInput formControlName="reason" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Additional Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="button-row">
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="loading || appointmentForm.invalid">
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            {{ loading ? 'Booking...' : 'Book Appointment' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

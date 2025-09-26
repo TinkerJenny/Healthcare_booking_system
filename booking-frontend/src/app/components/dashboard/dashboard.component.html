@@ -1,0 +1,24 @@
+<!-- src/app/components/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <mat-toolbar color="primary">
+    <span>Healthcare Dashboard</span>
+    <span class="toolbar-spacer"></span>
+    <span *ngIf="currentUser">
+      Welcome, {{ currentUser.firstName }} {{ currentUser.lastName }}
+      ({{ currentUser.role }})
+    </span>
+    <button mat-button routerLink="/login">Logout</button>
+  </mat-toolbar>
+
+  <div class="dashboard-content">
+    <!-- Patient Dashboard -->
+    <div *ngIf="isPatient">
+      <app-patient-dashboard></app-patient-dashboard>
+    </div>
+
+    <!-- Doctor Dashboard -->
+    <div *ngIf="isDoctor">
+      <app-doctor-dashboard></app-doctor-dashboard>
+    </div>
+  </div>
+</div>

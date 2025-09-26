@@ -1,0 +1,68 @@
+/* src/styles.css - Global Styles */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background-color: #f5f5f5;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: calc(50% - 10px);
+  margin-right: 10px;
+}
+
+.half-width:last-child {
+  margin-right: 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.error-message {
+  color: #df1552;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+
+.error-snackbar {
+  background-color: #e72274;
+  color: white;
+}
+
+/* Status chip colors */
+.status-pending {
+  background-color: #ff9800;
+  color: white;
+}
+
+.status-confirmed {
+  background-color: #4caf50;
+  color: white;
+}
+
+.status-cancelled {
+  background-color: #e72a73;
+  color: white;
+}
+
+.status-completed {
+  background-color: #2196f3;
+  color: white;
+}

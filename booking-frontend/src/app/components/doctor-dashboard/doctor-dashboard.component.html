@@ -1,0 +1,122 @@
+<!-- src/app/components/doctor-dashboard/doctor-dashboard.component.html -->
+<div class="doctor-dashboard">
+  <div class="dashboard-header">
+    <h2>Doctor Dashboard</h2>
+    <div class="header-actions">
+      <button mat-raised-button color="primary">
+        <mat-icon>schedule</mat-icon>
+        View Schedule
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Quick Stats -->
+    <div class="stats-row">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ getTotalAppointments() }}</div>
+          <div class="stat-label">Total Appointments</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ getPendingAppointments() }}</div>
+          <div class="stat-label">Pending</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ getConfirmedAppointments() }}</div>
+          <div class="stat-label">Today's Appointments</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ getCompletedAppointments() }}</div>
+          <div class="stat-label">Completed</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Appointments List -->
+    <mat-card class="appointments-card">
+      <mat-card-header>
+        <mat-card-title>Patient Appointments</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <div *ngIf="!loading && appointments.length === 0" class="no-appointments">
+          <mat-icon>event_note</mat-icon>
+          <p>No appointments scheduled</p>
+        </div>
+
+        <div *ngIf="!loading && appointments.length > 0" class="appointments-list">
+          <mat-card *ngFor="let appointment of appointments" class="appointment-card">
+            <mat-card-header>
+              <div mat-card-avatar>
+                <mat-icon>person</mat-icon>
+              </div>
+              <mat-card-title>{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</mat-card-title>
+              <mat-card-subtitle>{{ appointment.patient.email }}</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="appointment-details">
+                <div class="detail-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ appointment.appointmentDateTime | date:'medium' }}</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon>medical_services</mat-icon>
+                  <span>{{ appointment.reason }}</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon>phone</mat-icon>
+                  <span>{{ appointment.patient.phone || 'N/A' }}</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon>info</mat-icon>
+                  <mat-chip [ngClass]="'status-' + appointment.status.toLowerCase()">
+                    {{ appointment.status }}
+                  </mat-chip>
+                </div>
+              </div>
+              <div *ngIf="appointment.notes" class="appointment-notes">
+                <strong>Notes:</strong> {{ appointment.notes }}
+              </div>
+            </mat-card-content>
+            
+            <mat-card-actions>
+              <button mat-button color="primary" 
+                      *ngIf="appointment.status === 'PENDING'"
+                      (click)="updateAppointmentStatus(appointment.id!, 'CONFIRMED')">
+                <mat-icon>check</mat-icon>
+                Confirm
+              </button>
+              <button mat-button color="accent" 
+                      *ngIf="appointment.status === 'CONFIRMED'"
+                      (click)="updateAppointmentStatus(appointment.id!, 'COMPLETED')">
+                <mat-icon>done</mat-icon>
+                Complete
+              </button>
+              <button mat-button color="warn" 
+                      *ngIf="appointment.status === 'PENDING' || appointment.status === 'CONFIRMED'"
+                      (click)="updateAppointmentStatus(appointment.id!, 'CANCELLED')">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

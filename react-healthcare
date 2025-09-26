@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Appointment System</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-peach: #FFB5A7;
+            --secondary-peach: #FCD5CE;
+            --light-peach: #F8EDEB;
+            --dark-blue: #1B365D;
+            --medium-blue: #2B4A6B;
+            --light-blue: #3A5A79;
+            --accent-coral: #FF8B80;
+            --white: #FFFFFF;
+            --light-gray: #F5F7FA;
+            --medium-gray: #E2E8F0;
+            --dark-gray: #4A5568;
+            --success: #48BB78;
+            --warning: #ED8936;
+            --danger: #F56565;
+            --shadow: 0 10px 25px rgba(27, 54, 93, 0.1);
+            --shadow-hover: 0 15px 35px rgba(27, 54, 93, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-peach) 0%, var(--secondary-peach) 100%);
+            min-height: 100vh;
+            color: var(--dark-blue);
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            color: var(--primary-peach);
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 181, 167, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: var(--primary-peach);
+            color: var(--dark-blue);
+            font-weight: bold;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-peach);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-blue);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 181, 167, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        /* Login/Register Forms */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .auth-header p {
+            color: var(--dark-gray);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-peach);
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 181, 167, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--light-gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-peach);
+            background: white;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(27, 54, 93, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--primary-peach) 0%, var(--accent-coral) 100%);
+            color: var(--dark-blue);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 181, 167, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #38A169 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #E53E3E 100%);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--dark-gray);
+        }
+
+        .auth-switch a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-switch a:hover {
+            color: var(--primary-peach);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-peach), var(--accent-coral));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-peach), var(--accent-coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            font-weight: bold;
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(27, 54, 93, 0.08);
+            margin-bottom: 1rem;
+            border-left: 5px solid var(--primary-peach);
+            transition: all 0.3s ease;
+        }
+
+        .appointment-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 25px rgba(27, 54, 93, 0.15);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #FED7AA, #F59E0B);
+            color: var(--dark-blue);
+        }
+
+        .status-confirmed {
+            background: linear-gradient(135deg, #BBF7D0, var(--success));
+            color: white;
+        }
+
+        .status-cancelled {
+            background: linear-gradient(135deg, #FCA5A5, var(--danger));
+            color: white;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, var(--secondary-peach), var(--primary-peach));
+            color: var(--dark-blue);
+        }
+
+        .appointment-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .info-item i {
+            color: var(--primary-peach);
+            width: 16px;
+        }
+
+        .appointment-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-gray);
+            border-top: 5px solid var(--primary-peach);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Messages */
+        .error-message {
+            background: linear-gradient(135deg, #FEE2E2, #FECACA);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 0 1rem;
+            }
+
+            .auth-card {
+                padding: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .appointment-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Animations */
+        .form-group {
+            position: relative;
+        }
+
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            transform: translateY(-25px) scale(0.8);
+            color: var(--primary-peach);
+        }
+
+        /* Floating Labels */
+        .floating-label {
+            position: relative;
+        }
+
+        .floating-label .form-label {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: var(--dark-gray);
+        }
+
+        .floating-label .form-input:focus + .form-label,
+        .floating-label .form-input:not(:placeholder-shown) + .form-label {
+            top: -0.5rem;
+            left: 0.5rem;
+            font-size: 0.875rem;
+            background: white;
+            padding: 0 0.5rem;
+            color: var(--primary-peach);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        const api = {
+            registerUser: (userData) => 
+                fetch(`${API_BASE_URL}/users/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                }),
+            
+            getDoctors: () => fetch(`${API_BASE_URL}/users/doctors`),
+            getPatients: () => fetch(`${API_BASE_URL}/users/patients`),
+            
+            createAppointment: (appointmentData) => 
+                fetch(`${API_BASE_URL}/appointments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(appointmentData)
+                }),
+            
+            getDoctorAppointments: (doctorId) => 
+                fetch(`${API_BASE_URL}/appointments/doctor/${doctorId}`),
+            
+            updateAppointmentStatus: (id, status) => 
+                fetch(`${API_BASE_URL}/appointments/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(status)
+                }),
+        };
+
+        // Components
+        const LoadingSpinner = () => (
+            <div className="loading">
+                <div className="spinner"></div>
+            </div>
+        );
+
+        const LoginForm = ({ onLogin, switchToRegister }) => {
+            const [credentials, setCredentials] = useState({ username: '', password: '' });
+            const [loading, setLoading] = useState(false);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                // Simulate login - replace with actual authentication
+                setTimeout(() => {
+                    onLogin({ username: credentials.username, role: 'ADMIN' });
+                    setLoading(false);
+                }, 1000);
+            };
+
+            return (
+                <div className="auth-container">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <h2><i className="fas fa-heartbeat"></i> Welcome Back</h2>
+                            <p>Sign in to your healthcare account</p>
+                        </div>
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group floating-label">
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={credentials.username}
+                                    onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                                    required
+                                />
+                                <label className="form-label">Username</label>
+                            </div>
+                            
+                            <div className="form-group floating-label">
+                                <input
+                                    type="password"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={credentials.password}
+                                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                                    required
+                                />
+                                <label className="form-label">Password</label>
+                            </div>
+                            
+                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-sign-in-alt"></i>}
+                                {loading ? 'Signing In...' : 'Sign In'}
+                            </button>
+                        </form>
+                        
+                        <div className="auth-switch">
+                            Don't have an account? <a onClick={switchToRegister}>Sign up here</a>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const RegisterForm = ({ onRegister, switchToLogin }) => {
+            const [formData, setFormData] = useState({
+                username: '',
+                email: '',
+                password: '',
+                firstName: '',
+                lastName: '',
+                phone: '',
+                role: 'PATIENT',
+                specialization: '',
+                licenseNumber: ''
+            });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                try {
+                    const response = await api.registerUser(formData);
+                    if (response.ok) {
+                        const user = await response.json();
+                        onRegister(user);
+                    } else {
+                        const errorText = await response.text();
+                        setError(errorText);
+                    }
+                } catch (err) {
+                    setError('Registration failed. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="auth-container">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <h2><i className="fas fa-user-plus"></i> Join Us</h2>
+                            <p>Create your healthcare account</p>
+                        </div>
+                        
+                        {error && <div className="error-message">{error}</div>}
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="form-group floating-label">
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder=" "
+                                        value={formData.firstName}
+                                        onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                        required
+                                    />
+                                    <label className="form-label">First Name</label>
+                                </div>
+                                
+                                <div className="form-group floating-label">
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder=" "
+                                        value={formData.lastName}
+                                        onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                        required
+                                    />
+                                    <label className="form-label">Last Name</label>
+                                </div>
+                            </div>
+                            
+                            <div className="form-group floating-label">
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                                    required
+                                />
+                                <label className="form-label">Username</label>
+                            </div>
+                            
+                            <div className="form-group floating-label">
+                                <input
+                                    type="email"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                    required
+                                />
+                                <label className="form-label">Email</label>
+                            </div>
+                            
+                            <div className="form-group floating-label">
+                                <input
+                                    type="password"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    required
+                                />
+                                <label className="form-label">Password</label>
+                            </div>
+                            
+                            <div className="form-group floating-label">
+                                <input
+                                    type="tel"
+                                    className="form-input"
+                                    placeholder=" "
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                />
+                                <label className="form-label">Phone</label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label className="form-label">Role</label>
+                                <select
+                                    className="form-select"
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({...formData, role: e.target.value})}
+                                >
+                                    <option value="PATIENT">Patient</option>
+                                    <option value="DOCTOR">Doctor</option>
+                                </select>
+                            </div>
+                            
+                            {formData.role === 'DOCTOR' && (
+                                <>
+                                    <div className="form-group floating-label">
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder=" "
+                                            value={formData.specialization}
+                                            onChange={(e) => setFormData({...formData, specialization: e.target.value})}
+                                        />
+                                        <label className="form-label">Specialization</label>
+                                    </div>
+                                    
+                                    <div className="form-group floating-label">
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder=" "
+                                            value={formData.licenseNumber}
+                                            onChange={(e) => setFormData({...formData, licenseNumber: e.target.value})}
+                                        />
+                                        <label className="form-label">License Number</label>
+                                    </div>
+                                </>
+                            )}
+                            
+                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-user-plus"></i>}
+                                {loading ? 'Creating Account...' : 'Create Account'}
+                            </button>
+                        </form>
+                        
+                        <div className="auth-switch">
+                            Already have an account? <a onClick={switchToLogin}>Sign in here</a>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Header = ({ user, activeTab, setActiveTab, onLogout }) => (
+            <header className="header">
+                <div className="header-content">
+                    <div className="logo">
+                        <i className="fas fa-heartbeat"></i>
+                        HealthCare Pro
+                    </div>
+                    
+                    {user && (
+                        <>
+                            <nav>
+                                <ul className="nav-menu">
+                                    <li 
+                                        className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('dashboard')}
+                                    >
+                                        <i className="fas fa-tachometer-alt"></i> Dashboard
+                                    </li>
+                                    <li 
+                                        className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('appointments')}
+                                    >
+                                        <i className="fas fa-calendar-check"></i> Appointments
+                                    </li>
+                                    <li 
+                                        className={`nav-item ${activeTab === 'users' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('users')}
+                                    >
+                                        <i className="fas fa-users"></i> Users
+                                    </li>
+                                    <li 
+                                        className={`nav-item ${activeTab === 'book' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('book')}
+                                    >
+                                        <i className="fas fa-plus-circle"></i> Book Appointment
+                                    </li>
+                                </ul>
+                            </nav>
+                            
+                            <div className="user-actions">
+                                <div className="user-avatar" title={`${user.firstName} ${user.lastName}`}>
+                                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                                </div>
+                                <button className="btn btn-secondary btn-small" onClick={onLogout}>
+                                    <i className="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </header>
+        );
+
+        const Dashboard = ({ appointments, doctors, patients }) => {
+            const stats = {
+                totalAppointments: appointments.length,
+                pendingAppointments: appointments.filter(a => a.status === 'PENDING').length,
+                confirmedAppointments: appointments.filter(a => a.status === 'CONFIRMED').length,
+                totalDoctors: doctors.length,
+                totalPatients: patients.length
+            };
+
+            return (
+                <div className="dashboard">
+                    <div className="dashboard-header">
+                        <h1>Healthcare Dashboard</h1>
+                        <p>Welcome to your comprehensive healthcare management system</p>
+                    </div>
+                    
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-icon">
+                                <i className="fas fa-calendar-check"></i>
+                            </div>
+                            <div className="stat-number">{stats.totalAppointments}</div>
+                            <div className="stat-label">Total Appointments</div>
+                        </div>
+                        
+                        <div className="stat-card">
+                            <div className="stat-icon">
+                                <i className="fas fa-clock"></i>
+                            </div>
+                            <div className="stat-number">{stats.pendingAppointments}</div>
+                            <div className="stat-label">Pending Appointments</div>
+                        </div>
+                        
+                        <div className="stat-card">
+                            <div className="stat-icon">
+                                <i className="fas fa-user-md"></i>
+                            </div>
+                            <div className="stat-number">{stats.totalDoctors}</div>
+                            <div className="stat-label">Active Doctors</div>
+                        </div>
+                        
+                        <div className="stat-card">
+                            <div className="stat-icon">
+                                <i className="fas fa-users"></i>
+                            </div>
+                            <div className="stat-number">{stats.totalPatients}</div>
+                            <div className="stat-label">Registered Patients</div>
+                        </div>
+                    </div>
+                    
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">Recent Appointments</h3>
+                        </div>
+                        {appointments.slice(0, 5).map(appointment => (
+                            <AppointmentCard key={appointment.id} appointment={appointment} />
+                        ))}
+                        {appointments.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--dark-gray)' }}>
+                                <i className="fas fa-calendar-plus" style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--primary-peach)' }}></i>
+                                <p>No appointments yet. Book your first appointment!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const AppointmentCard = ({ appointment, onStatusUpdate }) => {
+            const formatDate = (dateString) => {
+                return new Date(dateString).toLocaleString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            return (
+                <div className="appointment-card">
+                    <div className="appointment-header">
+                        <div className={`status-badge status-${appointment.status?.toLowerCase()}`}>
+                            {appointment.status}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: 'var(--dark-gray)' }}>
+                            ID: #{appointment.id}
+                        </div>
+                    </div>
+                    
+                    <div className="appointment-info">
+                        <div className="info-item">
+                            <i className="fas fa-user"></i>
+                            <span><strong>Patient:</strong> {appointment.patient?.firstName} {appointment.patient?.lastName}</span>
+                        </div>
+                        <div className="info-item">
+                            <i className="fas fa-user-md"></i>
+                            <span><strong>Doctor:</strong> Dr. {appointment.doctor?.firstName} {appointment.doctor?.lastName}</span>
+                        </div>
+                        <div className="info-item">
+                            <i className="fas fa-calendar"></i>
+                            <span><strong>Date:</strong> {formatDate(appointment.appointmentDateTime)}</span>
+                        </div>
+                        {appointment.doctor?.specialization && (
+                            <div className="info-item">
+                                <i className="fas fa-stethoscope"></i>
+                                <span><strong>Specialty:</strong> {appointment.doctor.specialization}</span>
+                            </div>
+                        )}
+                    </div>
+                    
+                    {appointment.reason && (
+                        <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--light-peach)', borderRadius: '8px' }}>
+                            <strong>Reason:</strong> {appointment.reason}
+                        </div>
+                    )}
+                    
+                    {appointment.notes && (
+                        <div style={{ marginTop: '0.5rem', padding: '1rem', background: 'var(--light-gray)', borderRadius: '8px' }}>
+                            <strong>Notes:</strong> {appointment.notes}
+                        </div>
+                    )}
+                    
+                    {onStatusUpdate && appointment.status === 'PENDING' && (
+                        <div className="appointment-actions">
+                            <button 
+                                className="btn btn-success btn-small"
+                                onClick={() => onStatusUpdate(appointment.id, 'CONFIRMED')}
+                            >
+                                <i className="fas fa-check"></i> Confirm
+                            </button>
+                            <button 
+                                className="btn btn-danger btn-small"
+                                onClick={() => onStatusUpdate(appointment.id, 'CANCELLED')}
+                            >
+                                <i className="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    )}
+                    
+                    {onStatusUpdate && appointment.status === 'CONFIRMED' && (
+                        <div className="appointment-actions">
+                            <button 
+                                className="btn btn-primary btn-small"
+                                onClick={() => onStatusUpdate(appointment.id, 'COMPLETED')}
+                            >
+                                <i className="fas fa-check-circle"></i> Mark Complete
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const BookAppointmentForm = ({ doctors, patients, onAppointmentBooked }) => {
+            const [formData, setFormData] = useState({
+                patientId: '',
+                doctorId: '',
+                appointmentDateTime: '',
+                reason: '',
+                notes: ''
+            });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+                setSuccess('');
+
+                try {
+                    const appointmentData = {
+                        patient: { id: parseInt(formData.patientId) },
+                        doctor: { id: parseInt(formData.doctorId) },
+                        appointmentDateTime: formData.appointmentDateTime,
+                        reason: formData.reason,
+                        notes: formData.notes
+                    };
+
+                    const response = await api.createAppointment(appointmentData);
+                    if (response.ok) {
+                        const appointment = await response.json();
+                        setSuccess('Appointment booked successfully!');
+                        onAppointmentBooked(appointment);
+                        setFormData({
+                            patientId: '',
+                            doctorId: '',
+                            appointmentDateTime: '',
+                            reason: '',
+                            notes: ''
+                        });
+                    } else {
+                        const errorText = await response.text();
+                        setError(errorText);
+                    }
+                } catch (err) {
+                    setError('Failed to book appointment. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <h3 className="card-title">
+                            <i className="fas fa-calendar-plus"></i> Book New Appointment
+                        </h3>
+                    </div>
+                    
+                    {error && <div className="error-message">{error}</div>}
+                    {success && <div className="success-message">{success}</div>}
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label className="form-label">Select Patient</label>
+                                <select
+                                    className="form-select"
+                                    value={formData.patientId}
+                                    onChange={(e) => setFormData({...formData, patientId: e.target.value})}
+                                    required
+                                >
+                                    <option value="">Choose a patient...</option>
+                                    {patients.map(patient => (
+                                        <option key={patient.id} value={patient.id}>
+                                            {patient.firstName} {patient.lastName} ({patient.email})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label className="form-label">Select Doctor</label>
+                                <select
+                                    className="form-select"
+                                    value={formData.doctorId}
+                                    onChange={(e) => setFormData({...formData, doctorId: e.target.value})}
+                                    required
+                                >
+                                    <option value="">Choose a doctor...</option>
+                                    {doctors.map(doctor => (
+                                        <option key={doctor.id} value={doctor.id}>
+                                            Dr. {doctor.firstName} {doctor.lastName} - {doctor.specialization}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div className="form-group">
+                            <label className="form-label">Appointment Date & Time</label>
+                            <input
+                                type="datetime-local"
+                                className="form-input"
+                                value={formData.appointmentDateTime}
+                                onChange={(e) => setFormData({...formData, appointmentDateTime: e.target.value})}
+                                min={new Date().toISOString().slice(0, 16)}
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label className="form-label">Reason for Visit</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="e.g., Regular checkup, Follow-up visit, etc."
+                                value={formData.reason}
+                                onChange={(e) => setFormData({...formData, reason: e.target.value})}
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label className="form-label">Additional Notes</label>
+                            <textarea
+                                className="form-input"
+                                placeholder="Any additional information..."
+                                value={formData.notes}
+                                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                                rows="3"
+                                style={{ resize: 'vertical' }}
+                            />
+                        </div>
+                        
+                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                            {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-calendar-check"></i>}
+                            {loading ? 'Booking Appointment...' : 'Book Appointment'}
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        const UserManagement = ({ doctors, patients, onUserAdded }) => {
+            const [showAddUser, setShowAddUser] = useState(false);
+
+            return (
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ color: 'var(--dark-blue)' }}>User Management</h2>
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => setShowAddUser(!showAddUser)}
+                        >
+                            <i className="fas fa-user-plus"></i>
+                            {showAddUser ? 'Cancel' : 'Add New User'}
+                        </button>
+                    </div>
+                    
+                    {showAddUser && (
+                        <div className="card" style={{ marginBottom: '2rem' }}>
+                            <RegisterForm 
+                                onRegister={(user) => {
+                                    onUserAdded(user);
+                                    setShowAddUser(false);
+                                }}
+                                switchToLogin={() => {}}
+                            />
+                        </div>
+                    )}
+                    
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">
+                                <i className="fas fa-user-md"></i> Doctors ({doctors.length})
+                            </h3>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                            {doctors.map(doctor => (
+                                <div key={doctor.id} className="appointment-card">
+                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <div style={{ 
+                                            width: '50px', 
+                                            height: '50px', 
+                                            borderRadius: '50%', 
+                                            background: 'linear-gradient(135deg, var(--primary-peach), var(--accent-coral))',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'var(--dark-blue)',
+                                            fontWeight: 'bold',
+                                            marginRight: '1rem'
+                                        }}>
+                                            {doctor.firstName?.charAt(0)}{doctor.lastName?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ color: 'var(--dark-blue)' }}>
+                                                Dr. {doctor.firstName} {doctor.lastName}
+                                            </h4>
+                                            <p style={{ color: 'var(--dark-gray)', fontSize: '0.875rem' }}>
+                                                {doctor.specialization}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="appointment-info">
+                                        <div className="info-item">
+                                            <i className="fas fa-envelope"></i>
+                                            <span>{doctor.email}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-phone"></i>
+                                            <span>{doctor.phone || 'N/A'}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-id-card"></i>
+                                            <span>License: {doctor.licenseNumber || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {doctors.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--dark-gray)' }}>
+                                <i className="fas fa-user-md" style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--primary-peach)' }}></i>
+                                <p>No doctors registered yet.</p>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">
+                                <i className="fas fa-users"></i> Patients ({patients.length})
+                            </h3>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                            {patients.map(patient => (
+                                <div key={patient.id} className="appointment-card">
+                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <div style={{ 
+                                            width: '50px', 
+                                            height: '50px', 
+                                            borderRadius: '50%', 
+                                            background: 'linear-gradient(135deg, var(--dark-blue), var(--medium-blue))',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            fontWeight: 'bold',
+                                            marginRight: '1rem'
+                                        }}>
+                                            {patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ color: 'var(--dark-blue)' }}>
+                                                {patient.firstName} {patient.lastName}
+                                            </h4>
+                                            <p style={{ color: 'var(--dark-gray)', fontSize: '0.875rem' }}>
+                                                Patient
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="appointment-info">
+                                        <div className="info-item">
+                                            <i className="fas fa-envelope"></i>
+                                            <span>{patient.email}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-phone"></i>
+                                            <span>{patient.phone || 'N/A'}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-calendar"></i>
+                                            <span>Joined: {new Date(patient.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {patients.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--dark-gray)' }}>
+                                <i className="fas fa-users" style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--primary-peach)' }}></i>
+                                <p>No patients registered yet.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const AppointmentsView = ({ appointments, onStatusUpdate }) => (
+            <div>
+                <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ color: 'var(--dark-blue)' }}>All Appointments</h2>
+                    <p style={{ color: 'var(--dark-gray)' }}>Manage and track all appointments</p>
+                </div>
+                
+                <div className="card">
+                    <div className="card-header">
+                        <h3 className="card-title">
+                            <i className="fas fa-calendar-check"></i> Appointments List ({appointments.length})
+                        </h3>
+                    </div>
+                    {appointments.map(appointment => (
+                        <AppointmentCard 
+                            key={appointment.id} 
+                            appointment={appointment} 
+                            onStatusUpdate={onStatusUpdate}
+                        />
+                    ))}
+                    {appointments.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--dark-gray)' }}>
+                            <i className="fas fa-calendar-plus" style={{ fontSize: '4rem', marginBottom: '1rem', color: 'var(--primary-peach)' }}></i>
+                            <h3>No Appointments Yet</h3>
+                            <p>Start by booking your first appointment!</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+
+        // Main App Component
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [showLogin, setShowLogin] = useState(true);
+            const [appointments, setAppointments] = useState([]);
+            const [doctors, setDoctors] = useState([]);
+            const [patients, setPatients] = useState([]);
+            const [loading, setLoading] = useState(false);
+
+            const loadData = async () => {
+                setLoading(true);
+                try {
+                    const [doctorsRes, patientsRes] = await Promise.all([
+                        api.getDoctors(),
+                        api.getPatients()
+                    ]);
+
+                    if (doctorsRes.ok && patientsRes.ok) {
+                        const doctorsData = await doctorsRes.json();
+                        const patientsData = await patientsRes.json();
+
+                        setDoctors(doctorsData);
+                        setPatients(patientsData);
+
+                        // Load appointments for all doctors
+                        const allAppointments = [];
+                        for (const doctor of doctorsData) {
+                            try {
+                                const appointmentsRes = await api.getDoctorAppointments(doctor.id);
+                                if (appointmentsRes.ok) {
+                                    const doctorAppointments = await appointmentsRes.json();
+                                    allAppointments.push(...doctorAppointments);
+                                }
+                            } catch (err) {
+                                console.error(`Failed to load appointments for doctor ${doctor.id}:`, err);
+                            }
+                        }
+                        setAppointments(allAppointments);
+                    }
+                } catch (error) {
+                    console.error('Failed to load data:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                if (user) {
+                    loadData();
+                }
+            }, [user]);
+
+            const handleLogin = (userData) => {
+                setUser(userData);
+                setActiveTab('dashboard');
+            };
+
+            const handleRegister = (userData) => {
+                setUser(userData);
+                setActiveTab('dashboard');
+            };
+
+            const handleLogout = () => {
+                setUser(null);
+                setActiveTab('dashboard');
+                setShowLogin(true);
+            };
+
+            const handleAppointmentBooked = (appointment) => {
+                setAppointments([...appointments, appointment]);
+                setActiveTab('appointments');
+            };
+
+            const handleStatusUpdate = async (id, status) => {
+                try {
+                    const response = await api.updateAppointmentStatus(id, status);
+                    if (response.ok) {
+                        const updatedAppointment = await response.json();
+                        setAppointments(appointments.map(a => 
+                            a.id === id ? updatedAppointment : a
+                        ));
+                    }
+                } catch (error) {
+                    console.error('Failed to update appointment status:', error);
+                }
+            };
+
+            const handleUserAdded = (newUser) => {
+                if (newUser.role === 'DOCTOR') {
+                    setDoctors([...doctors, newUser]);
+                } else {
+                    setPatients([...patients, newUser]);
+                }
+            };
+
+            const renderContent = () => {
+                if (loading) return <LoadingSpinner />;
+
+                switch (activeTab) {
+                    case 'dashboard':
+                        return <Dashboard appointments={appointments} doctors={doctors} patients={patients} />;
+                    case 'appointments':
+                        return <AppointmentsView appointments={appointments} onStatusUpdate={handleStatusUpdate} />;
+                    case 'users':
+                        return <UserManagement doctors={doctors} patients={patients} onUserAdded={handleUserAdded} />;
+                    case 'book':
+                        return <BookAppointmentForm doctors={doctors} patients={patients} onAppointmentBooked={handleAppointmentBooked} />;
+                    default:
+                        return <Dashboard appointments={appointments} doctors={doctors} patients={patients} />;
+                }
+            };
+
+            if (!user) {
+                return (
+                    <div className="app-container">
+                        <Header />
+                        {showLogin ? (
+                            <LoginForm 
+                                onLogin={handleLogin} 
+                                switchToRegister={() => setShowLogin(false)} 
+                            />
+                        ) : (
+                            <RegisterForm 
+                                onRegister={handleRegister} 
+                                switchToLogin={() => setShowLogin(true)} 
+                            />
+                        )}
+                    </div>
+                );
+            }
+
+            return (
+                <div className="app-container">
+                    <Header 
+                        user={user} 
+                        activeTab={activeTab} 
+                        setActiveTab={setActiveTab} 
+                        onLogout={handleLogout} 
+                    />
+                    <main className="main-content">
+                        {renderContent()}
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

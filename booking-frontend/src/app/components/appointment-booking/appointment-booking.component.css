@@ -1,0 +1,6 @@
+/* src/app/components/appointment-booking/appointment-booking.component.css */
+.appointment-booking-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}

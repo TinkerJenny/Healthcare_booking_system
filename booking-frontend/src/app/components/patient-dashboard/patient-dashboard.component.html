@@ -1,0 +1,104 @@
+<!-- src/app/components/patient-dashboard/patient-dashboard.component.html -->
+<div class="patient-dashboard">
+  <div class="dashboard-header">
+    <h2>Patient Dashboard</h2>
+    <button mat-raised-button color="primary" routerLink="/book-appointment">
+      <mat-icon>add</mat-icon>
+      Book New Appointment
+    </button>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Quick Stats -->
+    <div class="stats-row">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ appointments.length }}</div>
+          <div class="stat-label">Total Appointments</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-number">{{ getPendingAppointmentsCount() }}</div>
+          <div class="stat-label">Pending</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+         <div class="stat-number">{{ getConfirmedAppointmentsCount() }}</div>
+          <div class="stat-label">Confirmed</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Appointments List -->
+    <mat-card class="appointments-card">
+      <mat-card-header>
+        <mat-card-title>My Appointments</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <div *ngIf="!loading && appointments.length === 0" class="no-appointments">
+          <mat-icon>event_note</mat-icon>
+          <p>No appointments found</p>
+          <button mat-raised-button color="primary" routerLink="/book-appointment">
+            Book Your First Appointment
+          </button>
+        </div>
+
+        <div *ngIf="!loading && appointments.length > 0" class="appointments-list">
+          <mat-card *ngFor="let appointment of appointments" class="appointment-card">
+            <mat-card-header>
+              <div mat-card-avatar>
+                <mat-icon>person</mat-icon>
+              </div>
+              <mat-card-title>Dr. {{ appointment.doctor.firstName }} {{ appointment.doctor.lastName }}</mat-card-title>
+              <mat-card-subtitle>{{ appointment.doctor.specialization }}</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="appointment-details">
+                <div class="detail-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ appointment.appointmentDateTime | date:'medium' }}</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon>medical_services</mat-icon>
+                  <span>{{ appointment.reason }}</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon>info</mat-icon>
+                  <mat-chip [ngClass]="'status-' + appointment.status.toLowerCase()">
+                    {{ appointment.status }}
+                  </mat-chip>
+                </div>
+              </div>
+              <div *ngIf="appointment.notes" class="appointment-notes">
+                <strong>Notes:</strong> {{ appointment.notes }}
+              </div>
+            </mat-card-content>
+            
+            <mat-card-actions>
+              <button mat-button color="warn" 
+                      *ngIf="appointment.status === 'PENDING'"
+                      (click)="cancelAppointment(appointment.id!)">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+              <button mat-button color="primary">
+                <mat-icon>edit</mat-icon>
+                Reschedule
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

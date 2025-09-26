@@ -1,0 +1,18 @@
+<div class="app-container">
+  <nav class="navbar" *ngIf="showNavbar">
+    <div class="nav-brand">
+      <h2>HealthCare System</h2>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/book-appointment" routerLinkActive="active">Book Appointment</a>
+      <a routerLink="/appointments" routerLinkActive="active">My Appointments</a>
+      <a routerLink="/doctor-schedule" routerLinkActive="active">Doctor Schedule</a>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+  
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
